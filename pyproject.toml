@@ -1,0 +1,6 @@
+[tool.isort]
+profile = "black"
+known_bytelatent = "lst"
+known_apps = "apps"
+known_third_party = "wandb"
+sections = "FUTURE,STDLIB,THIRDPARTY,BYTELATENT,APPS,FIRSTPARTY,LOCALFOLDER"
