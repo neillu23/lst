@@ -70,59 +70,61 @@ uv pip install --group compile_xformers --no-build-isolation
 uv sync
 `````
 
----
 
-## Downloading Training Data
-Note: The following instructions are not well tested in the LST code as it is based on the lingua code, which we have diverged from.
+## Data Preparation
+LST is trained on a mixture of large-scale web text and interleaved speech-text data.
+This repository provides scripts to download and prepare example training data.
 
-Use the provided script to download and prepare data from huggingface (among `fineweb_edu`, `fineweb_edu_10bt`, or `dclm_baseline_1.0`).
-This command will download the `fineweb_edu` and prepare it for training in the `./data` directory, specifying the amount of memory `terashuf` (the tool used to shuffle samples) will be allocated. By default, the number of chunks (`nchunks`) is 32. If you are running on fewer than 32 GPUs, it is recommended to set `nchunks` to 1 or to match `nchunks` with the number of GPUs (`nchunks` = NGPUs). See [here](https://github.com/facebookresearch/lingua/issues/55#issuecomment-2483643076) for more details.
+### Download Text Data
+Note: The following instructions are not well tested in the LST code as they are based on the Lingua code, which we have diverged from.
+
+Use the following script to download and prepare text datasets from Hugging Face (e.g., `fineweb_edu`, `fineweb_edu_10bt`, or `dclm_baseline_1.0`):
 
 ```bash
 python setup/download_prepare_hf_data.py fineweb_edu <MEMORY> --data_dir ./data --seed 42 --nchunks <NCHUNKS>
 ```
 
-to download tokenizer (here llama3), use the following script:
+- `terashuf` is used to shuffle samples during preprocessing. 
+- By default, the number of chunks (`nchunks`) is 32. 
+- If you are running on fewer than 32 GPUs, it is recommended to set `nchunks` to 1 or to match `nchunks` with the number of GPUs (`nchunks` = NGPUs). 
+
+See [here](https://github.com/facebookresearch/lingua/issues/55#issuecomment-2483643076) for more details.
+
+
+
+### Download Tokenizer
+To download the tokenizer (e.g., Llama 3):
 
 ```bash
 python setup/download_tokenizer.py llama3 <SAVE_PATH> --api_key <HUGGINGFACE_TOKEN>
+```
 
-An example of speech training data is available in the `data_example` folder.
+### Speech Data Format
+Speech training data should be discretized into HuBERT tokens.
 
-# Training
+An example data layout is provided in: 
 
-**The provided configurations are templates, you need to adapt them for them to work (change `dump_dir`, `data.root_dir`, `data.tokenizer.path`, etc ...)**
+```
+data_example/
+```
+
+In our experiments, speech tokens are generated:
+- at 25 Hz
+- using a 501-entry codebook
+
+
+## Training
+
+**The provided configurations are templates and need to be adapted before use (change `dump_dir`, `data.root_dir`, `data.tokenizer.path`, etc ...)**
 
 ```bash
-# stool stands for SLURM tool !
+# stool stands for SLURM tool 
 python -m lst.stool script=lst.train config=lst/configs/lst.yaml nodes=1 partition=<partition>
 # if you want to launch locally you can use torchrun
 torchrun --nproc-per-node 8 -m lst.train config=lst/configs/lst.yaml
 # or you can also launch on 1 GPU
 python -m lst.train  config=lst/configs/lst.yaml
-`````
-
----
-
-# Data
-
-LST is trained on a mixture of **text data** and **interleaved speech-text data**.
-
-## Text Data
-
-Large-scale web text corpora.
-
-## Speech Data
-
-Speech datasets discretized into HuBERT tokens:
-
-- LibriLight
-- People’s Speech
-- Multilingual LibriSpeech
-- Spotify Podcasts
-
-Speech tokens are generated at **25 Hz with a 501-entry codebook**.
-
+```
 
 ## Linting
 
@@ -159,7 +161,6 @@ If you build upon this repository, please consider citing BLT as well.
 }
 ```
 
----
 
 # License
 The LST code is partially based on Meta BLT.
