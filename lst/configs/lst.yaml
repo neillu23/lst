@@ -32,10 +32,8 @@ model:
   max_encoder_seq_length: 12288
   pad_to_max_length: true
   patching_threshold: 3.1439168453216553
-  encoder_hash_byte_group_size: [4]
-  encoder_hash_byte_group_vocab: 50002
-  encoder_hash_byte_group_nb_functions: 3
-  encoder_enable_byte_ngrams: false
+  encoder_hash_byte_group_size: []
+
   cross_attn_encoder: true # assuming cross_attention is true
   cross_attn_decoder: true # assuming cross_attention is true
   cross_attn_window_encoder: 512
@@ -84,10 +82,10 @@ model:
   downsampling_by_pooling: "max"
 
 data:
-  root_dir: ???
+  root_dir: data_example
   sources:
     text_data_source_1: 1.0
-    ppl30k_on_the_fly: 1.0
+    mls_on_the_fly: 1.0
   batch_size: 2
   prefetch_size: 64
   seq_len: 4096

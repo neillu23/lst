@@ -72,20 +72,35 @@ uv sync
 
 ---
 
+## Downloading Training Data
+Note: The following instructions are not well tested in the LST code as it is based on the lingua code, which we have diverged from.
+
+Use the provided script to download and prepare data from huggingface (among `fineweb_edu`, `fineweb_edu_10bt`, or `dclm_baseline_1.0`).
+This command will download the `fineweb_edu` and prepare it for training in the `./data` directory, specifying the amount of memory `terashuf` (the tool used to shuffle samples) will be allocated. By default, the number of chunks (`nchunks`) is 32. If you are running on fewer than 32 GPUs, it is recommended to set `nchunks` to 1 or to match `nchunks` with the number of GPUs (`nchunks` = NGPUs). See [here](https://github.com/facebookresearch/lingua/issues/55#issuecomment-2483643076) for more details.
+
+```bash
+python setup/download_prepare_hf_data.py fineweb_edu <MEMORY> --data_dir ./data --seed 42 --nchunks <NCHUNKS>
+```
+
+to download tokenizer (here llama3), use the following script:
+
+```bash
+python setup/download_tokenizer.py llama3 <SAVE_PATH> --api_key <HUGGINGFACE_TOKEN>
+
+An example of speech training data is available in the `data_example` folder.
+
 # Training
 
 **The provided configurations are templates, you need to adapt them for them to work (change `dump_dir`, `data.root_dir`, `data.tokenizer.path`, etc ...)**
 
 ```bash
 # stool stands for SLURM tool !
-python -m bytelatent.stool script=bytelatent.train config=bytelatent/configs/debug.yaml nodes=1 partition=<partition>
+python -m lst.stool script=lst.train config=lst/configs/lst.yaml nodes=1 partition=<partition>
 # if you want to launch locally you can use torchrun
-torchrun --nproc-per-node 8 -m bytelatent.train config=bytelatent/configs/debug.yaml
+torchrun --nproc-per-node 8 -m lst.train config=lst/configs/lst.yaml
 # or you can also launch on 1 GPU
-python -m bytelatent.train  config=bytelatent/configs/debug.yaml
+python -m lst.train  config=lst/configs/lst.yaml
 `````
-
-Note: The internal module name `bytelatent` is inherited from the original BLT codebase on which this implementation builds.
 
 ---
 

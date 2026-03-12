@@ -28,7 +28,7 @@ except (ImportError, ModuleNotFoundError):
     logging.debug("Apex not found. Using nn.RMSNorm")
     RMSNorm = nn.RMSNorm
 
-if int(os.environ.get("BLT_ALLOW_MISSING_FLEX_ATTENTION", False)) == 0:
+if int(os.environ.get("LST_ALLOW_MISSING_FLEX_ATTENTION", False)) == 0:
     flex_attention_comp = torch.compile(flex_attention)
 else:
     flex_attention_comp = None

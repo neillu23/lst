@@ -46,12 +46,12 @@ def parse_interleaved_pairs(s: str) -> List[Tuple[List[str], List[str]]]:
     pair them with the nearest segment of the other type when possible.
     """
     pairs: List[Tuple[List[str], List[str]]] = []
-    if not s.startswith("<META MODE SEP>"):
-        s = f"<META MODE SEP>TEXT {s}"
+    if not s.startswith("<LST MODE SEP>"):
+        s = f"<LST MODE SEP>TEXT {s}"
 
     last_text: Optional[List[str]] = None
 
-    for segment in s.split("<META MODE SEP>"):
+    for segment in s.split("<LST MODE SEP>"):
         if not segment.strip():
             continue
         head, payload = split_head_payload(segment)
@@ -241,9 +241,9 @@ def _random_interleaved_string_and_hu(self, s: str, *, lower_bound_text: int = 5
         # No core text: output a single HUBERT segment (fallback)
         inter_str = ""
         if flat_frames:
-            inter_str = "<META MODE SEP>HUBERT " + " ".join(flat_frames)
+            inter_str = "<LST MODE SEP>HUBERT " + " ".join(flat_frames)
         hu_length = [len(flat_frames)] if flat_frames else []
-        inter_str = inter_str[15:] if inter_str.startswith("<META MODE SEP>") else inter_str
+        inter_str = inter_str[15:] if inter_str.startswith("<LST MODE SEP>") else inter_str
         return inter_str, hu_length
 
     # Generate random block layout ("text"/"speech" with lengths in core-text tokens)
@@ -271,16 +271,16 @@ def _random_interleaved_string_and_hu(self, s: str, *, lower_bound_text: int = 5
 
         if block_type == "text":
             if span_text:
-                pieces.append("<META MODE SEP>TEXT " + " ".join(span_text))
+                pieces.append("<LST MODE SEP>TEXT " + " ".join(span_text))
         else:  # speech
             span_frames, audio_lens = _slice_frames_half_sil(span_text, start, end, cum, frame_counts, flat_text, flat_frames)
-            pieces.append("<META MODE SEP>HUBERT " + " ".join(span_frames))
+            pieces.append("<LST MODE SEP>HUBERT " + " ".join(span_frames))
 
             if isinstance(audio_lens, list):
                 hu_length_total += [audio_lens]
 
     inter_str = " ".join(pieces)
-    inter_str = inter_str[15:] if inter_str.startswith("<META MODE SEP>") else inter_str
+    inter_str = inter_str[15:] if inter_str.startswith("<LST MODE SEP>") else inter_str
     return inter_str.replace(" [SIL]", ""), ([hu_length_total] if hu_length_total else [])
 
 
@@ -342,7 +342,7 @@ class LstTokenizer(Tokenizer):
         self.speech_vocab_size_unit = speech_vocab_size_unit
 
 
-        # --- BLT offset rule (add_mode_token always True) ---
+        # --- LST offset rule (add_mode_token always True) ---
         self.add_mode_token = True
         self.offsetting_special_char = OFFSET + 2  # 4 + 2 = 6
         self.speech_offset_start = self.text_vocab_size + self.offsetting_special_char
@@ -527,7 +527,7 @@ class LstTokenizer(Tokenizer):
         tokens: List[int] = []
         hu_length_total: List[int] = []
 
-        for segment in s.split("<META MODE SEP>"):
+        for segment in s.split("<LST MODE SEP>"):
             # TEXT segment
             if segment[0] == "T":
                 txt_ids = self._encode_text(segment[5:], bos=False, eos=False)
@@ -558,11 +558,11 @@ class LstTokenizer(Tokenizer):
             if k == "text":
                 txt = self._decode_text(b, cut_at_eos=False)
                 if txt:
-                    pieces.append(f"<META MODE SEP>TEXT {txt}")
+                    pieces.append(f"<LST MODE SEP>TEXT {txt}")
             else:
                 sp = self._decode_speech(b, mode=self.speech_mode, cut_at_eos=False)
                 if sp:
-                    pieces.append(f"<META MODE SEP>HUBERT {sp}")
+                    pieces.append(f"<LST MODE SEP>HUBERT {sp}")
             b.clear()
 
         for t in toks:
@@ -578,7 +578,7 @@ class LstTokenizer(Tokenizer):
         flush(kind, buf)
 
         out = " ".join(pieces)
-        return out[15:] if out.startswith("<META MODE SEP>") else out
+        return out[15:] if out.startswith("<LST MODE SEP>") else out
 
     # ---------- helpers ----------
     @staticmethod

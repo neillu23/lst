@@ -1,6 +1,6 @@
 # Copyright (c) Meta Platforms, Inc. and affiliates.
 
-from lst.constants import BLT_DATA
+from lst.constants import LST_DATA
 from lst.data.iterators.dev_iterators import (
     BltTestIterator,
     BltTestWithEntropiesIterator,
@@ -15,7 +15,7 @@ def test_preprocess_iter():
     tokenizer_args = TokenizerArgs(
         name="blt",
         init_kwargs={
-            "bpe_tokenizer_path": BLT_DATA / "tokenizer_final_32k.minus_inf_ws.model"
+            "bpe_tokenizer_path": LST_DATA / "tokenizer_final_32k.minus_inf_ws.model"
         },
     )
     for mode in [
@@ -45,7 +45,7 @@ def test_non_entropy_patch_iter():
     tokenizer_args = TokenizerArgs(
         name="blt",
         init_kwargs={
-            "bpe_tokenizer_path": BLT_DATA / "tokenizer_final_32k.minus_inf_ws.model"
+            "bpe_tokenizer_path": LST_DATA / "tokenizer_final_32k.minus_inf_ws.model"
         },
     )
     for mode in [
@@ -76,7 +76,7 @@ def test_entropy_patch_iter():
     tokenizer_args = TokenizerArgs(
         name="blt",
         init_kwargs={
-            "bpe_tokenizer_path": BLT_DATA / "tokenizer_final_32k.minus_inf_ws.model"
+            "bpe_tokenizer_path": LST_DATA / "tokenizer_final_32k.minus_inf_ws.model"
         },
     )
     data_it = BltTestWithEntropiesIterator(total)

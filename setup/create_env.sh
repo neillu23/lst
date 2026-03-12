@@ -21,7 +21,7 @@ start_time=$(date +%s)
 current_date=$(date +%y%m%d)
 
 # Create environment name with the current date
-env_prefix=blt_$current_date
+env_prefix=lst_$current_date
 
 # Create the conda environment
 

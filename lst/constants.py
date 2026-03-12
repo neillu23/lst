@@ -2,4 +2,4 @@
 import os
 from pathlib import Path
 
-BLT_DATA = Path(os.environ.get("BLT_DATA", "data"))
+LST_DATA = Path(os.environ.get("LST_DATA", "data"))

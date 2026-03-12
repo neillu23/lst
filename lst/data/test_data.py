@@ -6,12 +6,12 @@ import pytest
 from omegaconf import OmegaConf
 
 from lst.args import TrainArgs
-from lst.constants import BLT_DATA
+from lst.constants import LST_DATA
 
 
 def get_test_config():
-    if "BLT_INTERNAL" in os.environ:
-        internal_dir = os.environ["BLT_INTERNAL"]
+    if "LST_INTERNAL" in os.environ:
+        internal_dir = os.environ["LST_INTERNAL"]
     else:
         internal_dir = "../internal-blt/configs"
     test_config = os.path.join(internal_dir, "tests.yaml")
@@ -33,7 +33,7 @@ def test_first_batch_matches():
     train_args.data.load_async = False
 
     # Test data created by pickling first batch in train loop then exiting
-    with open(os.path.join(BLT_DATA, "fixtures", "first_batch_0.pickle"), "rb") as f:
+    with open(os.path.join(LST_DATA, "fixtures", "first_batch_0.pickle"), "rb") as f:
         first_batch = pickle.load(f)
 
     # Emulate 1 node, 8 gpu training

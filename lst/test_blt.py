@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 import torch
 
-from lst.constants import BLT_DATA
+from lst.constants import LST_DATA
 from lst.data.data_types import Batch
 from lst.data.ngram_processor import NgramProcessor
 from lst.model.blt import (
@@ -52,7 +52,7 @@ def batch_to_tensors_and_gpu(batch):
 
 
 def fake_batch():
-    batch_dict = torch.load(os.path.join(BLT_DATA, "test_batch.pt"), weights_only=False)
+    batch_dict = torch.load(os.path.join(LST_DATA, "test_batch.pt"), weights_only=False)
     del batch_dict["x2"]
     del batch_dict["y2"]
     del batch_dict["src_names"]
@@ -151,7 +151,7 @@ class TestByteLatentTransformer:
             encoder_hash_byte_group_vocab=args.encoder_hash_byte_group_vocab,
         )
 
-        reference_path = os.path.join(BLT_DATA, "local_encoder_tokens.pt")
+        reference_path = os.path.join(LST_DATA, "local_encoder_tokens.pt")
         reference_tokens = torch.load(reference_path).to(device)
         torch.testing.assert_close(
             local_encoder_tokens,
@@ -257,7 +257,7 @@ class TestByteLatentTransformer:
         _, _, _, patch_lengths, _ = batch_to_tensors_and_gpu(batch)
 
         tensors = {
-            name: torch.load(os.path.join(BLT_DATA, filename)).float().to(device)
+            name: torch.load(os.path.join(LST_DATA, filename)).float().to(device)
             for name, filename in test_files.items()
         }
         decoder_patch_ids = decoder_patch_ids_from_lengths(
@@ -295,7 +295,7 @@ class TestByteLatentTransformer:
         }
 
         tensors = {
-            name: torch.load(os.path.join(BLT_DATA, filename)).float().to(device)
+            name: torch.load(os.path.join(LST_DATA, filename)).float().to(device)
             for name, filename in test_files.items()
         }
 
@@ -325,7 +325,7 @@ class TestByteLatentTransformer:
             "global_tokens": "global_tokens.pt",
         }
         tensors = {
-            name: torch.load(os.path.join(BLT_DATA, filename)).float().to(device)
+            name: torch.load(os.path.join(LST_DATA, filename)).float().to(device)
             for name, filename in test_files.items()
         }
         h, cache = global_transformer(
@@ -344,9 +344,9 @@ class TestByteLatentTransformer:
     def test_blt_transformer_forward(self, attn_impl):
         args = create_args()
         if attn_impl == "sdpa":
-            os.environ["BLT_SUPPRESS_ATTN_ERROR"] = "1"
+            os.environ["LST_SUPPRESS_ATTN_ERROR"] = "1"
         else:
-            os.environ["BLT_SUPPRESS_ATTN_ERROR"] = "0"
+            os.environ["LST_SUPPRESS_ATTN_ERROR"] = "0"
 
         args = args.model_copy(update=dict(attn_impl=attn_impl))
         model = ByteLatentTransformer(args)
@@ -415,7 +415,7 @@ class TestByteLatentTransformer:
             8: 50000,
         }
         batch = fake_batch()
-        ngram_processor = NgramProcessor(BLT_DATA, ngram_to_size)
+        ngram_processor = NgramProcessor(LST_DATA, ngram_to_size)
         ngram_ids = ngram_processor.encode_token_ngrams(batch.x)
         ngram_ids = np.stack(ngram_ids, axis=0)
         batch = replace(batch, ngram_ids=ngram_ids)
